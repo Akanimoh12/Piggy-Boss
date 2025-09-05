@@ -1,0 +1,103 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 
+frontend 
+README.md
+SETUP.md
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Hardhat files
+cache/
+artifacts/
+deployments/localhost/
+deployments/hardhat/
+typechain-types/
+
+# Coverage reports
+coverage/
+.nyc_output/
+lcov.info
+
+# Frontend specific
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/storybook-static/
+
+# Contract specific
+contracts/cache/
+contracts/artifacts/
+contracts/typechain/
+contracts/coverage/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Vercel
+.vercel/
+
+# Next.js (if used later)
+.next/
+
+# Miscellaneous
+*.tgz
+*.tar.gz
+.npmrc
+
+# Testing
+test-results/
+playwright-report/
+.nyc_output/
+
+# Documentation build
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# AI and ML models (if used)
+*.model
+*.pkl
+*.h5
