@@ -1,21 +1,129 @@
-import { useAccount } from 'wagmi';
+import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import { toast } from 'react-hot-toast';
-import { SOMNIA_CONTRACTS } from '../abi';
+import { parseUnits, formatUnits } from 'viem';
+import { SOMNIA_CONTRACTS, MockUSDTABI } from '../abi';
 
-// Temporary simplified hooks for contract integration
-// Note: Using mock data for now, will be enhanced as we resolve wagmi config issues
+// Helper function to safely format units
+const safeFormatUnits = (value: unknown, decimals: number): string => {
+  try {
+    if (value === undefined || value === null) return '0';
+    if (typeof value === 'bigint' || typeof value === 'number' || typeof value === 'string') {
+      return formatUnits(BigInt(value.toString()), decimals);
+    }
+    return '0';
+  } catch (error) {
+    console.error('Error formatting units:', error);
+    return '0';
+  }
+};
 
-// Hook for MockUSDT operations
+// Helper function to safely convert to number
+const safeToNumber = (value: unknown): number => {
+  try {
+    if (value === undefined || value === null) return 0;
+    if (typeof value === 'bigint' || typeof value === 'number' || typeof value === 'string') {
+      return Number(value);
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error converting to number:', error);
+    return 0;
+  }
+};
+
+// Hook for MockUSDT operations with real contract integration
 export const useMockUSDT = () => {
   const { address } = useAccount();
 
+  // Get USDT balance
+  const { data: usdtBalance, refetch: refetchBalance } = useContractRead({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    enabled: !!address,
+    watch: true,
+  });
+
+  // Get allowance for PiggyVault
+  const { data: allowance, refetch: refetchAllowance } = useContractRead({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'allowance',
+    args: address ? [address, SOMNIA_CONTRACTS.PIGGY_VAULT] : undefined,
+    enabled: !!address,
+    watch: true,
+  });
+
+  // Check if user can claim faucet
+  const { data: canClaimFaucet } = useContractRead({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'canClaimFaucet',
+    args: address ? [address] : undefined,
+    enabled: !!address,
+    watch: true,
+  });
+
+  // Get time until next claim
+  const { data: timeUntilNextClaim } = useContractRead({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'timeUntilNextClaim',
+    args: address ? [address] : undefined,
+    enabled: !!address,
+    watch: true,
+  });
+
+  // Get user stats
+  const { data: userStats } = useContractRead({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'getUserStats',
+    args: address ? [address] : undefined,
+    enabled: !!address,
+    watch: true,
+  });
+
+  // Get faucet stats
+  const { data: faucetStats } = useContractRead({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'getFaucetStats',
+    enabled: true,
+    watch: true,
+  });
+
+  // Faucet claim
+  const { writeAsync: claimFaucetWrite, isLoading: isClaimingFaucet } = useContractWrite({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'claimFromFaucet',
+  });
+
+  // Approve PiggyVault
+  const { writeAsync: approveWrite, isLoading: isApproving } = useContractWrite({
+    address: SOMNIA_CONTRACTS.MOCK_USDT,
+    abi: MockUSDTABI,
+    functionName: 'approve',
+  });
+
   const handleClaimFaucet = async () => {
     try {
-      // TODO: Implement actual contract call
+      if (!canClaimFaucet) {
+        toast.error('Cannot claim faucet at this time');
+        return;
+      }
+
+      const tx = await claimFaucetWrite();
       toast.success('Faucet claimed successfully!');
-      console.log('Claiming faucet for address:', address);
-      return { hash: '0x123' };
+      
+      // Refetch balances after successful claim
+      refetchBalance();
+      
+      return tx;
     } catch (error: any) {
+      console.error('Faucet claim error:', error);
       toast.error(error.message || 'Failed to claim faucet');
       throw error;
     }
@@ -23,23 +131,42 @@ export const useMockUSDT = () => {
 
   const handleApprove = async (amount: string) => {
     try {
-      // TODO: Implement actual contract call
+      const tx = await approveWrite({
+        args: [SOMNIA_CONTRACTS.PIGGY_VAULT, parseUnits(amount, 6)], // USDT has 6 decimals
+      });
       toast.success('Approval successful!');
-      console.log('Approving amount:', amount, 'for vault:', SOMNIA_CONTRACTS.PIGGY_VAULT);
-      return { hash: '0x123' };
+      
+      // Refetch allowance after successful approval
+      refetchAllowance();
+      
+      return tx;
     } catch (error: any) {
+      console.error('Approval error:', error);
       toast.error(error.message || 'Failed to approve');
       throw error;
     }
   };
 
   return {
-    usdtBalance: '1000.000000', // Mock balance
-    allowance: '0',
+    usdtBalance: safeFormatUnits(usdtBalance, 6),
+    allowance: safeFormatUnits(allowance, 6),
+    canClaimFaucet: Boolean(canClaimFaucet),
+    timeUntilNextClaim: safeToNumber(timeUntilNextClaim),
+    userStats: userStats && Array.isArray(userStats) && userStats.length >= 4 ? {
+      totalReceived: safeFormatUnits(userStats[0], 6),
+      claimCount: safeToNumber(userStats[1]),
+      firstClaimTime: safeToNumber(userStats[2]),
+      lastActivity: safeToNumber(userStats[3]),
+    } : null,
+    faucetStats: faucetStats && Array.isArray(faucetStats) && faucetStats.length >= 3 ? {
+      totalDistributed: safeFormatUnits(faucetStats[0], 6),
+      remainingSupply: safeFormatUnits(faucetStats[1], 6),
+      uniqueUsers: safeToNumber(faucetStats[2]),
+    } : null,
     claimFaucet: handleClaimFaucet,
     approve: handleApprove,
-    isClaimingFaucet: false,
-    isApproving: false,
+    isClaimingFaucet,
+    isApproving,
   };
 };
 
