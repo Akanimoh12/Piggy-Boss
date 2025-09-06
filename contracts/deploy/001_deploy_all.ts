@@ -1,10 +1,3 @@
-/**
- * Deploy Script for Piggy Boss Contracts
- * 
- * Deploys all smart contracts in the correct order and sets up
- * initial configurations for the Piggy Boss DeFi platform.
- */
-
 import { HardhatRuntimeEnvironment } from "hardhat/types"
 import { DeployFunction } from "hardhat-deploy/types"
 import { ethers } from "hardhat"
