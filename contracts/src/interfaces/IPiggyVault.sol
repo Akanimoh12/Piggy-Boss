@@ -1,12 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-/**
- * @title IPiggyVault
- * @dev Interface for the main PiggyVault contract
- */
 interface IPiggyVault {
-    // Structs
     struct Deposit {
         address user;
         uint256 amount;
@@ -18,14 +13,13 @@ interface IPiggyVault {
     }
     
     struct SavingsPlan {
-        uint256 duration;      // Duration in seconds
-        uint256 apyBasisPoints; // APY in basis points (100 = 1%)
-        uint256 minAmount;     // Minimum deposit amount
-        uint256 maxAmount;     // Maximum deposit amount
-        bool isActive;         // Whether plan is currently active
+        uint256 duration;
+        uint256 apyBasisPoints;
+        uint256 minAmount;
+        uint256 maxAmount;
+        bool isActive;
     }
     
-    // Events
     event DepositCreated(
         address indexed user,
         uint256 indexed depositId,

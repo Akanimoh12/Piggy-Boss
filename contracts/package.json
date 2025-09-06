@@ -6,8 +6,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.ts --network somnia",
-    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+    "deploy:somnia": "hardhat run scripts/deploy-somnia.ts --network somnia",
+    "deploy:local": "hardhat run scripts/deploy-somnia.ts --network localhost",
     "verify": "hardhat verify --network somnia",
     "coverage": "hardhat coverage",
     "size": "hardhat size-contracts",
@@ -42,7 +42,7 @@
     "typescript": "^5.2.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.0",
+    "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.9.0"
   }
 }

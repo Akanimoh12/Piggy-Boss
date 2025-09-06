@@ -3,28 +3,14 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-/**
- * @title InterestCalculator
- * @dev Library for calculating compound interest and yield-related math
- * @notice Provides precise calculations for savings interest with different compounding periods
- */
 library InterestCalculator {
     using SafeMath for uint256;
     
-    // Constants
-    uint256 public constant BASIS_POINTS = 10000; // 100% = 10,000 basis points
+    uint256 public constant BASIS_POINTS = 10000;
     uint256 public constant SECONDS_PER_DAY = 86400;
-    uint256 public constant SECONDS_PER_YEAR = 31536000; // 365 days
-    uint256 public constant PRECISION = 10**18; // 18 decimals for calculations
+    uint256 public constant SECONDS_PER_YEAR = 31536000;
+    uint256 public constant PRECISION = 10**18;
     
-    /**
-     * @dev Calculate compound interest for a given principal, APY, and time period
-     * @param _principal Principal amount
-     * @param _apyBasisPoints Annual Percentage Yield in basis points
-     * @param _timeElapsed Time elapsed in seconds
-     * @param _totalDuration Total duration of the savings plan in seconds
-     * @return Interest earned
-     */
     function calculateCompoundInterest(
         uint256 _principal,
         uint256 _apyBasisPoints,
@@ -35,13 +21,10 @@ library InterestCalculator {
             return 0;
         }
         
-        // Calculate the fraction of the total duration that has elapsed
         uint256 timeFraction = _timeElapsed.mul(PRECISION).div(_totalDuration);
         
-        // Convert APY to decimal (basis points to percentage)
         uint256 apyDecimal = _apyBasisPoints.mul(PRECISION).div(BASIS_POINTS);
         
-        // For short periods, use simple interest to avoid precision issues
         if (_timeElapsed < 1 days) {
             uint256 interest = _principal
                 .mul(apyDecimal)

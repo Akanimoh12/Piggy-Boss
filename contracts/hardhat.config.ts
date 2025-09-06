@@ -1,12 +1,13 @@
-import { HardhatUserConfig } from "hardhat/config";
+import { HardhatUserConfig, vars } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomicfoundation/hardhat-verify";
 import "hardhat-contract-sizer";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-import * as dotenv from "dotenv";
 
-dotenv.config({ path: "../.env" });
+const DEPLOYER_PRIVATE_KEY = vars.get("DEPLOYER_PRIVATE_KEY", "");
+const SOMNIA_RPC_URL = vars.get("SOMNIA_RPC_URL", "https://dream-rpc.somnia.network");
+const ETHERSCAN_API_KEY = vars.get("ETHERSCAN_API_KEY", "");
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -35,11 +36,9 @@ const config: HardhatUserConfig = {
     },
     
     somnia: {
-      url: process.env.SOMNIA_RPC_URL || "https://dream-rpc.somnia.network",
+      url: SOMNIA_RPC_URL,
       chainId: 50312,
-      accounts: process.env.DEPLOYER_PRIVATE_KEY 
-        ? [process.env.DEPLOYER_PRIVATE_KEY]
-        : [],
+      accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
       gasPrice: "auto",
       gas: "auto",
     },
@@ -47,7 +46,7 @@ const config: HardhatUserConfig = {
   
   etherscan: {
     apiKey: {
-      somnia: process.env.ETHERSCAN_API_KEY || "dummy",
+      somnia: ETHERSCAN_API_KEY || "dummy",
     },
     customChains: [
       {

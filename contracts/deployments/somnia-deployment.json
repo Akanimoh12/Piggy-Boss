@@ -1,0 +1,43 @@
+{
+  "network": "Somnia Testnet",
+  "chainId": 50312,
+  "rpc": "https://dream-rpc.somnia.network",
+  "explorer": "https://shannon-explorer.somnia.network",
+  "deployer": "0x9e321066FF35d640Fb76310DCFB570ECE4865470",
+  "timestamp": "2025-09-06T12:00:00.000Z",
+  "contracts": {
+    "MockUSDT": {
+      "address": "0xeE0667c01DeFEBca6d753544D6C8Db80ceaAC9B6",
+      "verified": true,
+      "description": "Test USDT token for Somnia testnet"
+    },
+    "YieldManager": {
+      "address": "0x53538F8b7cF6e3022E91C3742DD32672d1dBE0bE", 
+      "verified": true,
+      "explorerUrl": "https://shannon-explorer.somnia.network/address/0x53538F8b7cF6e3022E91C3742DD32672d1dBE0bE#code",
+      "description": "Manages APY calculations and yield distributions"
+    },
+    "NFTRewards": {
+      "address": "0x1Bd4FE7221e4796039c3F5eeD98ec80A84A36667",
+      "verified": true, 
+      "explorerUrl": "https://shannon-explorer.somnia.network/address/0x1Bd4FE7221e4796039c3F5eeD98ec80A84A36667#code",
+      "description": "Achievement-based NFT rewards system"
+    },
+    "PiggyVault": {
+      "address": "0x160a9B6Fd478b12E758ff047fEC08e6Bd4182D76",
+      "verified": true,
+      "explorerUrl": "https://shannon-explorer.somnia.network/address/0x160a9B6Fd478b12E758ff047fEC08e6Bd4182D76#code", 
+      "description": "Main savings vault with timelock and yield generation"
+    }
+  },
+  "permissions": {
+    "nftMinterAuthorized": true,
+    "yieldManagerConnected": true
+  },
+  "savingsPlans": [
+    { "duration": "30 days", "apy": "3%", "id": 30 },
+    { "duration": "90 days", "apy": "5%", "id": 90 },
+    { "duration": "180 days", "apy": "8%", "id": 180 },
+    { "duration": "365 days", "apy": "12%", "id": 365 }
+  ]
+}
