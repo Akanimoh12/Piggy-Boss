@@ -7,7 +7,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # 
-frontend 
+# frontend 
 # README.md
 SETUP.md
 install.sh

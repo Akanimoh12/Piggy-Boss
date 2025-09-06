@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/piggy-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Piggy Boss - DeFi Savings Platform on Somnia Network</title>
+    <meta name="title" content="Piggy Boss - DeFi Savings Platform on Somnia Network" />
+    <meta name="description" content="Earn high-yield interest on your crypto savings with Piggy Boss. Secure, transparent DeFi platform with NFT rewards and AI-powered insights on Somnia Network." />
+    <meta name="keywords" content="DeFi, savings, yield farming, crypto, blockchain, Somnia Network, NFT rewards, high APY, decentralized finance" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="Piggy Boss Team" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://piggyboss.finance/" />
+    <meta property="og:title" content="Piggy Boss - DeFi Savings Platform" />
+    <meta property="og:description" content="Earn high-yield interest on your crypto savings with Piggy Boss. Secure DeFi platform on Somnia Network." />
+    <meta property="og:image" content="https://piggyboss.finance/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Piggy Boss" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://piggyboss.finance/" />
+    <meta property="twitter:title" content="Piggy Boss - DeFi Savings Platform" />
+    <meta property="twitter:description" content="Earn high-yield interest on your crypto savings with Piggy Boss." />
+    <meta property="twitter:image" content="https://piggyboss.finance/twitter-image.png" />
+    <meta property="twitter:creator" content="@piggyboss" />
+    
+    <!-- Theme and Design -->
+    <meta name="theme-color" content="#0a120e" />
+    <meta name="color-scheme" content="light" />
+    <meta name="msapplication-TileColor" content="#0a120e" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+    
+    <!-- Favicon variations -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://dream-rpc.somnia.network" />
+    <link rel="preconnect" href="https://shannon-explorer.somnia.network" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Piggy Boss",
+      "description": "DeFi Savings Platform on Somnia Network",
+      "url": "https://piggyboss.finance",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "description": "High-yield crypto savings with NFT rewards",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Piggy Boss Team"
+      },
+      "screenshot": "https://piggyboss.finance/screenshot.png",
+      "softwareVersion": "1.0.0",
+      "datePublished": "2024-01-01",
+      "dateModified": "2024-01-01",
+      "provider": {
+        "@type": "Organization",
+        "name": "Piggy Boss",
+        "url": "https://piggyboss.finance"
+      }
+    }
+    </script>
+    
+    <!-- Critical CSS will be inlined here during build -->
+    <style>
+      /* Critical loading styles */
+      html {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #fbfbf9;
+        color: #0a120e;
+        overflow-x: hidden;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Loading animation */
+      .initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #fbfbf9 0%, #f0f0ea 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
+      
+      .initial-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      .loader-content {
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out;
+      }
+      
+      .loader-pig {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #9ba896 0%, #5f6361 100%);
+        border-radius: 50%;
+        margin: 0 auto 16px;
+        position: relative;
+        animation: bounce 2s infinite;
+      }
+      
+      .loader-pig::before {
+        content: '🐷';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+      }
+      
+      @keyframes bounce {
+        0%, 20%, 53%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40%, 43% {
+          transform: translateY(-20px);
+        }
+        70% {
+          transform: translateY(-10px);
+        }
+        90% {
+          transform: translateY(-4px);
+        }
+      }
+      
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .loader-text {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0a120e;
+        margin-bottom: 8px;
+      }
+      
+      .loader-subtext {
+        font-size: 14px;
+        color: #5f6361;
+      }
+      
+      /* Prevent flash of unstyled content */
+      .flash-prevention {
+        visibility: hidden;
+      }
+      
+      /* Ensure consistent box-sizing */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <!-- Initial Loading Screen -->
+    <div class="initial-loader" id="initial-loader">
+      <div class="loader-content">
+        <div class="loader-pig"></div>
+        <div class="loader-text">Loading Piggy Boss</div>
+        <div class="loader-subtext">Preparing your DeFi experience...</div>
+      </div>
+    </div>
+    
+    <!-- Main Application Mount Point -->
+    <div id="root" class="flash-prevention"></div>
+    
+    <!-- Fallback for users with JavaScript disabled -->
+    <noscript>
+      <div style="
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: #fbfbf9; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-family: Inter, sans-serif;
+        text-align: center;
+        padding: 20px;
+      ">
+        <div>
+          <h1 style="color: #0a120e; margin-bottom: 16px;">JavaScript Required</h1>
+          <p style="color: #5f6361; max-width: 400px; line-height: 1.6;">
+            Piggy Boss requires JavaScript to function properly. 
+            Please enable JavaScript in your browser settings and refresh the page.
+          </p>
+          <button 
+            onclick="window.location.reload()" 
+            style="
+              background: #0a120e; 
+              color: white; 
+              border: none; 
+              padding: 12px 24px; 
+              border-radius: 8px; 
+              font-size: 14px; 
+              cursor: pointer; 
+              margin-top: 16px;
+            "
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    </noscript>
+    
+    <!-- Module Script -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Hide initial loader and show app when React loads -->
+    <script>
+      // Remove loader when page is fully loaded
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const loader = document.getElementById('initial-loader');
+          const root = document.getElementById('root');
+          if (loader && root) {
+            loader.classList.add('hidden');
+            root.classList.remove('flash-prevention');
+            // Remove loader from DOM after animation
+            setTimeout(() => {
+              loader.remove();
+            }, 500);
+          }
+        }, 1000); // Show loader for at least 1 second for branding
+      });
+      
+      // Performance monitoring
+      if (window.performance && window.performance.mark) {
+        window.performance.mark('piggy-boss-start');
+      }
+    </script>
+  </body>
+</html>
