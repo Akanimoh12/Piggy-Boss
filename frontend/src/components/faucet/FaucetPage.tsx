@@ -47,14 +47,16 @@ const FaucetPage: React.FC = () => {
             >
               Test Token Faucet
             </motion.h1>
-            <motion.p
+
+            {/* <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
               className="text-lg text-gray-600 max-w-md mx-auto"
             >
               Get free USDT tokens for testing the Piggy Boss savings platform. All data is fetched live from our smart contracts on Somnia Network.
-            </motion.p>
+            </motion.p> */}
+
           </div>
 
           {/* Main Grid Layout */}

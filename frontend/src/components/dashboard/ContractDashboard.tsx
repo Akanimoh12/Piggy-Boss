@@ -15,7 +15,7 @@ import { useDashboardData } from '../../hooks/useDashboardData'
 import PortfolioPerformance from './PortfolioPerformance'
 import RecentActivity from './RecentActivity'
 
-const ModernDashboard: React.FC = () => {
+const ContractDashboard: React.FC = () => {
   const { address } = useAccount()
   const {
     dashboardStats,
@@ -111,7 +111,7 @@ const ModernDashboard: React.FC = () => {
                 : '$0.00'
               }
             </p>
-            {dashboardStats?.userNFTs && dashboardStats.userNFTs > 0 && (
+            {dashboardStats?.userNFTs && (
               <div className="flex items-center justify-end mt-2 text-sm opacity-75">
                 <FiAward className="w-4 h-4 mr-1" />
                 <span>{dashboardStats.userNFTs} NFT Rewards</span>
@@ -262,4 +262,4 @@ const ModernDashboard: React.FC = () => {
   )
 }
 
-export default ModernDashboard
+export default ContractDashboard
