@@ -11,6 +11,14 @@ export const SOMNIA_CONTRACTS = {
   PIGGY_VAULT: "0x160a9B6Fd478b12E758ff047fEC08e6Bd4182D76",
 } as const;
 
+// Export with alternative name for backward compatibility
+export const CONTRACT_ADDRESSES = {
+  PiggyVault: "0x160a9B6Fd478b12E758ff047fEC08e6Bd4182D76",
+  MockUSDT: "0xeE0667c01DeFEBca6d753544D6C8Db80ceaAC9B6",
+  YieldManager: "0x53538F8b7cF6e3022E91C3742DD32672d1dBE0bE",
+  NFTRewards: "0x1Bd4FE7221e4796039c3F5eeD98ec80A84A36667",
+} as const;
+
 
 // Network configuration
 export const SOMNIA_NETWORK = {
@@ -34,3 +42,4 @@ export const SAVINGS_PLANS = [
 ] as const;
 
 export type ContractName = keyof typeof CONTRACT_ADDRESSES
+export type SomniaContractName = keyof typeof SOMNIA_CONTRACTS

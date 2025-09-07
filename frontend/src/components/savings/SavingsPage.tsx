@@ -1,5 +1,7 @@
 /**
- * Enhanced Savings Page Component - Manage Live Savings Plans
+ * Enhanced Savings Page Compon  const isMatured = depositDetails.maturityDate <= new Date()
+  const daysRemaining = Math.max(0, Math.ceil((depositDetails.maturityDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+  const progress = Math.min(100, ((Date.now() - depositDetails.startDate.getTime()) / (depositDetails.maturityDate.getTime() - depositDetails.startDate.getTime())) * 100) - Manage Live Savings Plans
  * 
  * This component shows user's active deposits from the smart contract,
  * allows creating new deposits, and provides detailed deposit management.
@@ -9,9 +11,9 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useAccount } from 'wagmi'
 import { formatCurrency } from '@utils/formatters'
-import { usePiggyVault, useMockUSDT, useNFTRewards, useDepositDetails } from '@hooks/useContracts'
+import { usePiggyVault, useMockUSDT, useNFTRewards, useDepositDetails } from '@hooks/useContract'
 import DepositModal from '../dashboard/DepositModal'
-import { Calendar, TrendingUp, Clock, DollarSign, Award, Plus, Eye, ArrowUpRight } from 'lucide-react'
+import { TrendingUp, Clock, DollarSign, Award, Plus, Eye, ArrowUpRight } from 'lucide-react'
 
 interface DepositCardProps {
   depositId: number
@@ -49,7 +51,7 @@ const DepositCard: React.FC<DepositCardProps> = ({ depositId, onWithdraw, onEmer
               Deposit #{depositId}
             </h3>
             <p className="text-sm text-gray-600">
-              {depositDetails.planDays} Day Plan
+              {depositDetails.duration} Day Plan
             </p>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -131,11 +133,11 @@ const DepositCard: React.FC<DepositCardProps> = ({ depositId, onWithdraw, onEmer
           >
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Created:</span>
-              <span>{new Date(depositDetails.createdAt * 1000).toLocaleDateString()}</span>
+              <span>{depositDetails.startDate.toLocaleDateString()}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Maturity:</span>
-              <span>{new Date(depositDetails.maturityTime * 1000).toLocaleDateString()}</span>
+              <span>{depositDetails.maturityDate.toLocaleDateString()}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Accrued Interest:</span>
@@ -155,8 +157,8 @@ const SavingsPage: React.FC = () => {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
   
   // Contract hooks
-  const { userSummary, userDepositIds, withdrawDeposit, emergencyWithdraw, isWithdrawing, isEmergencyWithdrawing } = usePiggyVault()
-  const { usdtBalance } = useMockUSDT()
+  const { userSummary, userDeposits, withdrawDeposit, emergencyWithdraw, isWithdrawing, isEmergencyWithdrawing } = usePiggyVault()
+  const { balance: usdtBalance } = useMockUSDT()
   const { nftSummary, userTier } = useNFTRewards()
 
   const handleWithdraw = async (depositId: number) => {
@@ -217,7 +219,7 @@ const SavingsPage: React.FC = () => {
                 <div className="ml-4">
                   <p className="text-sm text-gray-600">Total Saved</p>
                   <p className="text-xl font-bold">
-                    {formatCurrency(parseFloat(userSummary.totalSaved))}
+                    {formatCurrency(parseFloat(userSummary.totalDeposited))}
                   </p>
                 </div>
               </div>
@@ -231,7 +233,7 @@ const SavingsPage: React.FC = () => {
                 <div className="ml-4">
                   <p className="text-sm text-gray-600">Total Earned</p>
                   <p className="text-xl font-bold text-green-600">
-                    +{formatCurrency(parseFloat(userSummary.totalEarned))}
+                    +{formatCurrency(parseFloat(userSummary.totalRewards))}
                   </p>
                 </div>
               </div>
@@ -244,7 +246,7 @@ const SavingsPage: React.FC = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm text-gray-600">Active Deposits</p>
-                  <p className="text-xl font-bold">{userSummary.activeDeposits}</p>
+                  <p className="text-xl font-bold">{userSummary.depositCount}</p>
                 </div>
               </div>
             </div>
@@ -285,7 +287,7 @@ const SavingsPage: React.FC = () => {
                 <div className="text-sm text-gray-600">Total Value</div>
                 <div className="text-lg font-semibold">
                   {formatCurrency(
-                    parseFloat(userSummary.totalSaved) + parseFloat(userSummary.totalEarned)
+                    parseFloat(userSummary.totalDeposited) + parseFloat(userSummary.totalRewards)
                   )}
                 </div>
               </div>
@@ -296,14 +298,14 @@ const SavingsPage: React.FC = () => {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">Your Deposits</h2>
-              {userDepositIds.length > 0 && (
+              {userDeposits.length > 0 && (
                 <div className="text-sm text-gray-600">
-                  {userDepositIds.length} active deposits
+                  {userDeposits.length} active deposits
                 </div>
               )}
             </div>
 
-            {userDepositIds.length === 0 ? (
+            {userDeposits.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                 <div className="text-gray-400 text-6xl mb-4">💰</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No deposits yet</h3>
@@ -320,10 +322,10 @@ const SavingsPage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userDepositIds.map((depositId) => (
+                {userDeposits.map((depositId: bigint, index: number) => (
                   <DepositCard
-                    key={depositId}
-                    depositId={depositId}
+                    key={index}
+                    depositId={Number(depositId)}
                     onWithdraw={handleWithdraw}
                     onEmergencyWithdraw={handleEmergencyWithdraw}
                   />

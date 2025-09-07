@@ -24,7 +24,7 @@ const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
   className = ''
 }) => {
   const [yieldOptimization, setYieldOptimization] = useState<YieldOptimization | null>(null)
-  const [depositTiming, setDepositTiming] = useState<DepositTiming | null>(null)
+  const [depositTiming] = useState<DepositTiming | null>(null)
   const [riskAssessment, setRiskAssessment] = useState<RiskAssessment | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -39,15 +39,13 @@ const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
     
     setIsLoading(true)
     try {
-      const [optimization, timing, risk] = await Promise.all([
-        aiService.getYieldOptimization([], amount),
-        aiService.getDepositTiming(),
-        aiService.assessRisk(amount, selectedPeriod.days)
+            const [yieldOptimization, riskAssessment] = await Promise.all([
+        aiService.getYieldOptimization([]),
+        aiService.assessRisk(amount, 30)
       ])
 
-      setYieldOptimization(optimization)
-      setDepositTiming(timing)
-      setRiskAssessment(risk)
+      setYieldOptimization(yieldOptimization)
+      setRiskAssessment(riskAssessment)
     } catch (error) {
       console.error('Failed to load recommendations:', error)
     } finally {

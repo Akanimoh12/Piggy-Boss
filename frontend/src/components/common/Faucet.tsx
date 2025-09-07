@@ -13,7 +13,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAccount } from 'wagmi';
-import { useMockUSDT } from '../../hooks/useContracts';
+// Import from the new hooks directory that uses our contract integration
+import { useFaucet } from '../../hooks';
 
 interface FaucetProps {
   className?: string;
@@ -30,16 +31,16 @@ const Faucet: React.FC<FaucetProps> = ({
   compact = false,
   onSuccessfulClaim
 }) => {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { 
-    usdtBalance, 
-    canClaimFaucet, 
-    timeUntilNextClaim, 
-    userStats, 
+    usdtBalance,
+    canClaimFaucet,
+    timeUntilNextClaim,
+    userStats,
     faucetStats,
-    claimFaucet, 
-    isClaimingFaucet 
-  } = useMockUSDT();
+    claimFaucet,
+    isClaimingFaucet
+  } = useFaucet();
 
   const [timeLeft, setTimeLeft] = useState(timeUntilNextClaim);
 
@@ -50,10 +51,11 @@ const Faucet: React.FC<FaucetProps> = ({
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setInterval(() => {
-        setTimeLeft(prev => prev > 0 ? prev - 1 : 0);
+        setTimeLeft((prev: number) => prev > 0 ? prev - 1 : 0);
       }, 1000);
       return () => clearInterval(timer);
     }
+    return undefined;
   }, [timeLeft]);
 
   const formatTime = (seconds: number) => {

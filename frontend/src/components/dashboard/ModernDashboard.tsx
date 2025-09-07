@@ -18,47 +18,48 @@ import {
 
 const ModernDashboard: React.FC = () => {
     const { address } = useAccount()
-    const { balance: usdtBalance, isLoading: usdtLoading } = useUSDTBalance()
-    const { totalDeposited, isLoading: depositsLoading } = useTotalDeposited()
-    const { totalRewards, isLoading: rewardsLoading } = useTotalRewards()
-    const { totalDeposits: globalDeposits, totalRewards: globalRewards } = useVaultStats()
+  const { balance: usdtBalance } = useUSDTBalance()
+  const { totalDeposited } = useTotalDeposited()
+  const { totalRewards } = useTotalRewards()
+  const { totalDeposits: globalDeposits, totalRewards: globalRewards } = useVaultStats()
 
-    const stats = [
+  
+  const stats = [
         {
             title: 'Total Balance',
-            value: `$${(usdtBalance + totalDeposited).toFixed(2)}`,
+            value: `$${(parseFloat(usdtBalance) + parseFloat(totalDeposited)).toFixed(2)}`,
             change: '+12.5%',
             changeType: 'positive' as 'positive' | 'negative' | 'neutral',
             icon: FiDollarSign,
             color: 'bg-blue-500',
-            isLoading: usdtLoading || depositsLoading,
+            isLoading: false,
         },
         {
             title: 'Active Deposits',
-            value: `$${totalDeposited.toFixed(2)}`,
+            value: `$${parseFloat(totalDeposited).toFixed(2)}`,
             change: '+$247.52',
             changeType: 'positive' as 'positive' | 'negative' | 'neutral',
             icon: FiPieChart,
             color: 'bg-green-500',
-            isLoading: depositsLoading,
+            isLoading: false,
         },
         {
             title: 'Total Rewards',
-            value: `$${totalRewards.toFixed(2)}`,
+            value: `$${parseFloat(totalRewards).toFixed(2)}`,
             change: '+8.2%',
             changeType: 'positive' as 'positive' | 'negative' | 'neutral',
             icon: FiTrendingUp,
             color: 'bg-purple-500',
-            isLoading: rewardsLoading,
+            isLoading: false,
         },
         {
             title: 'Available USDT',
-            value: `$${usdtBalance.toFixed(2)}`,
+            value: `$${parseFloat(usdtBalance).toFixed(2)}`,
             change: 'Ready to deposit',
             changeType: 'neutral' as 'positive' | 'negative' | 'neutral',
             icon: FiZap,
             color: 'bg-orange-500',
-            isLoading: usdtLoading,
+            isLoading: false,
         },
     ]
 
@@ -103,7 +104,7 @@ const ModernDashboard: React.FC = () => {
                     <div className="text-right">
                         <p className="text-sm opacity-75">Total Portfolio</p>
                         <p className="text-3xl font-bold">
-                            ${(totalDeposited + totalRewards).toFixed(2)}
+                            ${(parseFloat(totalDeposited) + parseFloat(totalRewards)).toFixed(2)}
                         </p>
                     </div>
                 </div>
@@ -150,6 +151,7 @@ const ModernDashboard: React.FC = () => {
                     )
                 })}
             </div>
+
 
             {/* Main Content Grid */}
             <div className="grid lg:grid-cols-3 gap-6">
@@ -256,11 +258,11 @@ const ModernDashboard: React.FC = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div className="text-center">
-                        <p className="text-3xl font-bold text-gray-900">${globalDeposits.toFixed(0)}</p>
+                        <p className="text-3xl font-bold text-gray-900">${parseFloat(globalDeposits).toFixed(0)}</p>
                         <p className="text-sm text-gray-600">Total Value Locked</p>
                     </div>
                     <div className="text-center">
-                        <p className="text-3xl font-bold text-gray-900">${globalRewards.toFixed(0)}</p>
+                        <p className="text-3xl font-bold text-gray-900">${parseFloat(globalRewards).toFixed(0)}</p>
                         <p className="text-sm text-gray-600">Total Rewards Distributed</p>
                     </div>
                     <div className="text-center">

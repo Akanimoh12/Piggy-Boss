@@ -1,19 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { formatCurrency } from '@utils/formatters'
-import { 
-  showDepositSuccessToast, 
-  showErrorToast, 
-  showLoadingToast, 
-  showTransactionPendingToast,
+import {
+  showErrorToast,
   showTransactionSuccessToast,
   showTransactionErrorToast,
-  updateToast, 
-  dismissToast 
-} from '@utils/toast'
+  showDepositSuccessToast,
+  showTransactionPendingToast
+} from '../../utils/toast'
 import { useAccount } from 'wagmi'
-import { usePiggyVault, useMockUSDT } from '@hooks/useContracts'
-import type { Id } from 'react-toastify'
+import { usePiggyVault, useMockUSDT } from '@hooks/useContract'
 import { X, TrendingUp, Lock, DollarSign, CheckCircle, Loader2, Sparkles } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
 
@@ -105,11 +101,16 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
   const [projectedEarnings, setProjectedEarnings] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [isApproved, setIsApproved] = useState(false)
+  const [isDepositing, setIsDepositing] = useState(false)
 
   // Check if amount is approved
-  const isApproved = useMemo(() => {
-    if (!amount || !allowance) return false
-    return parseFloat(allowance) >= parseFloat(amount)
+  useEffect(() => {
+    if (!amount || !allowance) {
+      setIsApproved(false)
+      return
+    }
+    setIsApproved(parseFloat(allowance) >= parseFloat(amount))
   }, [amount, allowance])
 
   // Generate chart data for projected earnings
@@ -203,10 +204,10 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
       // Call the actual approve function from contract hook
       await approve(amount)
       setStep(4)
-      showTransactionSuccessToast('USDT spending approved!', toastId)
+      showTransactionSuccessToast('USDT spending approved!')
     } catch (err: any) {
       setError('Approval failed. Please try again.')
-      showTransactionErrorToast('Approval failed. Please try again.', toastId)
+      showTransactionErrorToast('Approval failed. Please try again.')
     }
   }
 
@@ -228,10 +229,10 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
       await createDeposit(amount, selectedPeriod.days)
       setShowConfetti(true)
       setStep(5)
-      showDepositSuccessToast(parseFloat(amount), selectedPeriod.days, toastId)
+      showDepositSuccessToast(parseFloat(amount), selectedPeriod.apy)
     } catch (err: any) {
       setError('Deposit failed. Please try again.')
-      showTransactionErrorToast('Deposit failed. Please try again.', toastId)
+      showTransactionErrorToast('Deposit failed. Please try again.')
     }
   }
 
@@ -244,7 +245,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
     setError(null)
     setShowConfetti(false)
     setIsApproved(false)
-    setIsApproving(false)
     setIsDepositing(false)
     onClose()
   }

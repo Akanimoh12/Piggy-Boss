@@ -66,6 +66,16 @@ export interface AIInsights {
   }
 }
 
+interface SmartRecommendation {
+  id: string
+  type: 'timing' | 'amount' | 'duration' | 'strategy'
+  title: string
+  message: string
+  confidence: number
+  impact: 'low' | 'medium' | 'high'
+  recommendation: 'now' | 'wait' | 'partial_now'
+}
+
 class AIService {
   private static instance: AIService
   
@@ -78,8 +88,7 @@ class AIService {
 
   // Generate yield optimization suggestions
   async getYieldOptimization(
-    depositHistory: DepositHistory[],
-    currentAmount: number
+    depositHistory: DepositHistory[]
   ): Promise<YieldOptimization> {
     // Simulate AI processing delay
     await this.delay(1000)
@@ -118,46 +127,44 @@ class AIService {
   }
 
   // Predict best deposit timing
-  async getDepositTiming(
-    marketConditions: any = {},
-    userPattern: DepositHistory[] = []
-  ): Promise<DepositTiming> {
+    async generateSmartRecommendations(): Promise<SmartRecommendation[]> {
     await this.delay(800)
 
-    const currentHour = new Date().getHours()
-    const dayOfWeek = new Date().getDay()
-
-    // Mock AI timing predictions
-    if (dayOfWeek >= 1 && dayOfWeek <= 3 && currentHour >= 9 && currentHour <= 16) {
-      return {
+    return [
+      {
+        id: 'timing-1',
+        type: 'timing',
+        title: 'Optimal Deposit Timing',
+        message: 'Current market conditions favor immediate deposits with high yields.',
+        confidence: 85,
+        impact: 'high',
         recommendation: 'now',
-        reason: "Market conditions are optimal with high liquidity and stable rates",
-        confidence: 88,
-        expectedBenefit: 0.3
-      }
-    } else if (currentHour >= 22 || currentHour <= 6) {
-      return {
+      },
+      {
+        id: 'amount-1',
+        type: 'amount',
+        title: 'Consider Larger Deposits',
+        message: 'Higher deposit amounts unlock better yield rates and bonus rewards.',
+        confidence: 72,
+        impact: 'medium',
         recommendation: 'wait',
-        optimalTime: new Date(Date.now() + 8 * 60 * 60 * 1000), // 8 hours later
-        reason: "Low liquidity during off-hours may result in suboptimal rates",
-        confidence: 75,
-        expectedBenefit: 0.5
-      }
-    } else {
-      return {
+      },
+      {
+        id: 'duration-1',
+        type: 'duration',
+        title: 'Lock-in Period Strategy',
+        message: 'Medium-term locks (14-30 days) offer the best balance of yield and flexibility.',
+        confidence: 78,
+        impact: 'medium',
         recommendation: 'partial_now',
-        reason: "Consider depositing 60% now and waiting for better conditions for the remainder",
-        confidence: 82,
-        expectedBenefit: 0.4
       }
-    }
+    ]
   }
 
   // Assess risk for different strategies
   async assessRisk(
     amount: number,
-    duration: number,
-    userProfile: any = {}
+    duration: number
   ): Promise<RiskAssessment> {
     await this.delay(600)
 
@@ -201,7 +208,7 @@ class AIService {
       level,
       score,
       factors,
-      recommendation: this.getRiskRecommendation(level, score),
+      recommendation: this.getRiskRecommendation(level),
       volatilityPrediction: Math.random() * 0.15 + 0.05 // 5-20% volatility
     }
   }
@@ -209,8 +216,7 @@ class AIService {
   // Generate personalized savings goals
   async generateSavingsGoals(
     currentBalance: number,
-    depositHistory: DepositHistory[],
-    userPreferences: any = {}
+    depositHistory: DepositHistory[]
   ): Promise<SavingsGoal[]> {
     await this.delay(1200)
 
@@ -265,19 +271,22 @@ class AIService {
   // Get comprehensive AI insights
   async getAIInsights(
     depositHistory: DepositHistory[],
-    currentBalance: number,
-    userPreferences: any = {}
+    currentBalance: number
   ): Promise<AIInsights> {
-    const [yieldOptimization, depositTiming, riskAssessment, personalizedGoals] = await Promise.all([
-      this.getYieldOptimization(depositHistory, currentBalance),
-      this.getDepositTiming(),
+    const [yieldOptimization, riskAssessment, personalizedGoals] = await Promise.all([
+      this.getYieldOptimization(depositHistory),
       this.assessRisk(currentBalance, 30), // Default 30-day assessment
-      this.generateSavingsGoals(currentBalance, depositHistory, userPreferences)
+      this.generateSavingsGoals(currentBalance, depositHistory)
     ])
 
     return {
       yieldOptimization,
-      depositTiming,
+      depositTiming: {
+        recommendation: 'now',
+        reason: "Optimal market conditions detected",
+        confidence: 85,
+        expectedBenefit: 0.3
+      },
       riskAssessment,
       personalizedGoals,
       marketTrends: {
@@ -294,7 +303,7 @@ class AIService {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  private getRiskRecommendation(level: 'low' | 'medium' | 'high', score: number): string {
+  private getRiskRecommendation(level: 'low' | 'medium' | 'high'): string {
     switch (level) {
       case 'low':
         return "Excellent choice! This strategy aligns well with conservative risk management."

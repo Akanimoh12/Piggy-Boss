@@ -14,7 +14,6 @@ const Dashboard = React.lazy(() => import('@components/dashboard/Dashboard'))
 const SavingsPage = React.lazy(() => import('@components/savings/SavingsPage'))
 const DepositPage = React.lazy(() => import('@components/savings/DepositPage'))
 const FaucetPage = React.lazy(() => import('@components/faucet/FaucetPage'))
-const ToastDemo = React.lazy(() => import('@components/common/ToastDemo'))
 
 // Loading component
 const PageLoading = () => (
@@ -47,7 +46,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/savings" element={<Navigate to="/dashboard/savings" replace />} />
         <Route path="/deposit" element={<DepositPage />} />
         <Route path="/faucet" element={<Navigate to="/dashboard/faucet" replace />} />
-        <Route path="/toast-demo" element={<ToastDemo />} />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
