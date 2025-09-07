@@ -60,53 +60,33 @@ export const useUserStatistics = () => {
 export const useUserDeposits = () => {
   const { address } = useAccount()
 
-  const { data: depositCountData } = useContractRead({
+  // Get user deposit IDs using the correct contract function
+  const { data: userDepositIds, refetch: refetchDepositIds } = useContractRead({
     ...CONTRACTS.PiggyVault,
-    functionName: 'depositCounter',
+    functionName: 'getUserDeposits',
+    args: [address as `0x${string}`],
     enabled: !!address,
   })
 
-  const depositCount = depositCountData ? Number(depositCountData) : 0
+  const userDeposits = useMemo(() => {
+    if (!userDepositIds || (userDepositIds as bigint[]).length === 0) return []
+    
+    // Convert deposit IDs to readable format
+    return (userDepositIds as bigint[]).map((id, index) => ({
+      id: Number(id),
+      amount: '100.00', // This would need to be fetched from individual deposit details
+      planDays: 30,
+      timestamp: Date.now() - index * 24 * 60 * 60 * 1000,
+      type: 'deposit',
+      status: 'active'
+    }))
+  }, [userDepositIds])
 
-  // Get individual deposits for the user
-  const [userDeposits, setUserDeposits] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    if (!address || depositCount === 0) return
-
-    const fetchUserDeposits = async () => {
-      setIsLoading(true)
-      const deposits = []
-      
-      // Fetch the last 10 deposits for recent activity
-      const startId = Math.max(1, depositCount - 9)
-      
-      for (let i = startId; i <= depositCount; i++) {
-        try {
-          // This would need to be implemented based on your contract structure
-          // For now, we'll create mock data structure that matches expected format
-          deposits.push({
-            id: i,
-            amount: '100.00',
-            planDays: 30,
-            timestamp: Date.now() - (depositCount - i) * 24 * 60 * 60 * 1000,
-            type: 'deposit',
-            status: 'active'
-          })
-        } catch (error) {
-          console.error(`Error fetching deposit ${i}:`, error)
-        }
-      }
-      
-      setUserDeposits(deposits)
-      setIsLoading(false)
-    }
-
-    fetchUserDeposits()
-  }, [address, depositCount])
-
-  return { userDeposits, isLoading, refetch: () => {} }
+  return { 
+    userDeposits, 
+    isLoading: false, 
+    refetch: refetchDepositIds 
+  }
 }
 
 export const usePortfolioPerformance = () => {

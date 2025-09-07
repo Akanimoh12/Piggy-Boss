@@ -19,23 +19,17 @@ import DepositModal from './DepositModal';
 import { Faucet } from '../common/Faucet';
 import AIInsights from './AIInsights';
 import { DepositHistory } from '../../services/aiService';
-import { 
-  usePiggyVault, 
-  useMockUSDT, 
-  useNFTRewards, 
-  useUserActivity 
-} from '../../hooks/useContract';
+import { useDashboardData } from '../../hooks/useDashboardData';
+import { useSavingsBalance } from '../../hooks/useSavingsData';
 
 const Overview: React.FC = () => {
   const { isConnected, address } = useAccount();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
-  // Contract hooks for real-time data
-  const { userSummary, contractStats } = usePiggyVault();
-  const { balance: usdtBalance } = useMockUSDT();
-  const { nftBalance, userTier, achievementPoints } = useNFTRewards();
-  const { activities } = useUserActivity();
+  // Real-time contract data
+  const { dashboardStats, recentActivity, refetchAll } = useDashboardData();
+  const { refetch: refetchSavings } = useSavingsBalance();
 
   // Real-time clock update every second
   useEffect(() => {
@@ -46,44 +40,57 @@ const Overview: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Calculate real portfolio metrics
+  // Refetch all data periodically and after transactions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetchAll();
+      refetchSavings();
+    }, 10000); // Refetch every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [refetchAll, refetchSavings]);
+
+  // Calculate real portfolio metrics from contract data
   const portfolioMetrics = useMemo(() => {
-    const availableUSDT = parseFloat(usdtBalance) || 0;
-    // Calculate portfolio metrics from real contract data
-    const activeDeposits = parseFloat(userSummary.totalDeposited) || 0;
-    const totalRewards = parseFloat(userSummary.totalRewards) || 0;
-    
-    // Total Balance = Available USDT + Active Deposits + Total Rewards
-    const totalBalance = availableUSDT + activeDeposits + totalRewards;
-    
-    // Total Portfolio = Active Deposits + Total Rewards (value locked in platform)
-    const totalPortfolio = activeDeposits + totalRewards;
+    if (!dashboardStats) {
+      return {
+        availableUSDT: 0,
+        activeDeposits: 0,
+        totalRewards: 0,
+        totalBalance: 0,
+        totalPortfolio: 0,
+        activeDepositsCount: 0,
+      };
+    }
 
     return {
-      availableUSDT,
-      activeDeposits,
-      totalRewards,
-      totalBalance,
-      totalPortfolio,
-      activeDepositsCount: userSummary.depositCount || 0,
+      availableUSDT: dashboardStats.usdtBalance || 0,
+      activeDeposits: dashboardStats.totalDeposited || 0,
+      totalRewards: dashboardStats.totalRewards || 0,
+      totalBalance: dashboardStats.totalBalance || 0,
+      totalPortfolio: dashboardStats.totalPortfolio || 0,
+      activeDepositsCount: dashboardStats.userNFTs || 0, // Using NFT count as proxy for deposits
     };
-  }, [usdtBalance, userSummary]);
+  }, [dashboardStats]);
 
   // Create deposit history for AI insights from real contract data
   const depositHistory: DepositHistory[] = useMemo(() => {
-    if (!isConnected || userSummary.depositCount === 0) return [];
+    if (!isConnected || !recentActivity?.length) return [];
 
-    // Create mock deposit history based on user summary
-    return Array.from({ length: Math.min(userSummary.depositCount, 5) }, (_, index) => ({
-      id: (index + 1).toString(),
-      amount: portfolioMetrics.activeDeposits / Math.max(userSummary.depositCount, 1), // Distribute evenly
-      duration: 30, // Default to 30 days
-      apy: 12, // Default APY
-      timestamp: new Date(Date.now() - (index + 1) * 7 * 24 * 60 * 60 * 1000), // Weekly intervals
-      currentValue: (portfolioMetrics.activeDeposits + portfolioMetrics.totalRewards) / Math.max(userSummary.depositCount, 1),
-      isActive: true
-    }));
-  }, [isConnected, userSummary.depositCount, portfolioMetrics]);
+    // Convert real activity data to deposit history format
+    return recentActivity
+      .filter(activity => activity.type === 'deposit' || activity.type === 'deposit_created')
+      .slice(0, 5) // Take last 5 deposits
+      .map((activity, index) => ({
+        id: activity.id || (index + 1).toString(),
+        amount: activity.amount || 0,
+        duration: 30, // Default to 30 days (we can enhance this later)
+        apy: dashboardStats?.currentAPY || 12,
+        timestamp: activity.date || new Date(),
+        currentValue: activity.amount * 1.1, // Estimate with 10% growth
+        isActive: activity.status === 'completed' || activity.status === 'active'
+      }));
+  }, [isConnected, recentActivity, dashboardStats]);
 
   // Format activity for display
   const formatActivityDescription = (activity: any) => {
@@ -471,6 +478,12 @@ const Overview: React.FC = () => {
             <DepositModal
               isOpen={isDepositModalOpen}
               onClose={() => setIsDepositModalOpen(false)}
+              onSuccess={() => {
+                // Refetch all data after successful deposit
+                refetchAll();
+                refetchSavings();
+                setIsDepositModalOpen(false);
+              }}
             />
           )}
         </AnimatePresence>

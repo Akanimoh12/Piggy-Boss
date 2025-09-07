@@ -1,127 +1,107 @@
-/**
- * Enhanced Savings Page Compon  const isMatured = depositDetails.maturityDate <= new Date()
-  const daysRemaining = Math.max(0, Math.ceil((depositDetails.maturityDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-  const progress = Math.min(100, ((Date.now() - depositDetails.startDate.getTime()) / (depositDetails.maturityDate.getTime() - depositDetails.startDate.getTime())) * 100) - Manage Live Savings Plans
- * 
- * This component shows user's active deposits from the smart contract,
- * allows creating new deposits, and provides detailed deposit management.
- */
-
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useAccount } from 'wagmi'
-import { formatCurrency } from '@utils/formatters'
-import { usePiggyVault, useMockUSDT, useNFTRewards, useDepositDetails } from '@hooks/useContract'
-import DepositModal from '../dashboard/DepositModal'
-import { TrendingUp, Clock, DollarSign, Award, Plus, Eye, ArrowUpRight } from 'lucide-react'
+import { 
+  Clock, 
+  Award, 
+  Plus, 
+  Eye, 
+  ArrowUpRight,
+  PieChart,
+  Target,
+  Wallet,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
+  XCircle
+} from 'lucide-react'
+import { useSavingsData } from '../../hooks/useSavingsData'
+import { formatCurrency } from '../../utils/formatters'
+import SavingsModal from './SavingsModal'
 
 interface DepositCardProps {
-  depositId: number
+  deposit: {
+    id: number
+    user: string
+    amount: string
+    planDays: number
+    createdAt: number
+    maturityTime: number
+    isWithdrawn: boolean
+    accruedInterest: string
+  }
   onWithdraw: (id: number) => void
   onEmergencyWithdraw: (id: number) => void
 }
 
-const DepositCard: React.FC<DepositCardProps> = ({ depositId, onWithdraw, onEmergencyWithdraw }) => {
-  const { depositDetails, currentInterest } = useDepositDetails(depositId)
+const DepositCard: React.FC<DepositCardProps> = ({ deposit, onWithdraw, onEmergencyWithdraw }) => {
   const [showDetails, setShowDetails] = useState(false)
 
-  if (!depositDetails) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-        <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-      </div>
-    )
+  const isMatured = new Date(deposit.maturityTime) <= new Date()
+  const daysRemaining = Math.max(0, Math.ceil((deposit.maturityTime - Date.now()) / (1000 * 60 * 60 * 24)))
+  const progress = Math.min(100, ((Date.now() - deposit.createdAt) / (deposit.maturityTime - deposit.createdAt)) * 100)
+
+  const getStatusColor = () => {
+    if (deposit.isWithdrawn) return 'text-gray-500'
+    if (isMatured) return 'text-green-500'
+    return 'text-blue-500'
   }
 
-  const isMatured = new Date(depositDetails.maturityTime * 1000) <= new Date()
-  const daysRemaining = Math.max(0, Math.ceil((depositDetails.maturityTime * 1000 - Date.now()) / (1000 * 60 * 60 * 24)))
-  const progress = Math.min(100, ((Date.now() - depositDetails.createdAt * 1000) / (depositDetails.maturityTime * 1000 - depositDetails.createdAt * 1000)) * 100)
+  const getStatusText = () => {
+    if (deposit.isWithdrawn) return 'Withdrawn'
+    if (isMatured) return 'Matured'
+    return `${daysRemaining} days left`
+  }
 
   return (
     <motion.div
-      className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow"
+      className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-all duration-200"
       whileHover={{ y: -2 }}
     >
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              Deposit #{depositId}
+              {deposit.planDays}-Day Savings Plan
             </h3>
-            <p className="text-sm text-gray-600">
-              {depositDetails.duration} Day Plan
+            <p className={`text-sm font-medium ${getStatusColor()}`}>
+              {getStatusText()}
             </p>
           </div>
-          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-            isMatured 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-blue-100 text-blue-800'
-          }`}>
-            {isMatured ? 'Matured' : 'Active'}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <div className="text-2xl font-bold text-gray-900">
-              {formatCurrency(parseFloat(depositDetails.amount))}
-            </div>
-            <div className="text-sm text-gray-600">Principal</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-green-600">
-              +{formatCurrency(parseFloat(currentInterest))}
-            </div>
-            <div className="text-sm text-gray-600">Current Interest</div>
+          <div className="text-right">
+            <p className="text-2xl font-bold text-gray-900">
+              ${parseFloat(deposit.amount).toFixed(2)}
+            </p>
+            <p className="text-sm text-green-600">
+              +${parseFloat(deposit.accruedInterest).toFixed(2)} earned
+            </p>
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600">Progress</span>
-            <span className="text-sm font-medium">{progress.toFixed(1)}%</span>
+          <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <span>Progress</span>
+            <span>{progress.toFixed(1)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            <div
+              className={`h-2 rounded-full transition-all duration-300 ${
+                isMatured ? 'bg-green-500' : 'bg-blue-500'
+              }`}
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <div className="text-xs text-gray-500 mt-1">
-            {isMatured ? 'Ready to withdraw' : `${daysRemaining} days remaining`}
-          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-          >
-            <Eye className="w-4 h-4" />
-            Details
-          </button>
-          
-          {isMatured && (
-            <button
-              onClick={() => onWithdraw(depositId)}
-              className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <ArrowUpRight className="w-4 h-4" />
-              Withdraw
-            </button>
-          )}
-          
-          <button
-            onClick={() => onEmergencyWithdraw(depositId)}
-            className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors text-sm"
-          >
-            Emergency
-          </button>
-        </div>
+        {/* Details Toggle */}
+        <button
+          onClick={() => setShowDetails(!showDetails)}
+          className="flex items-center text-sm text-blue-600 hover:text-blue-700 mb-4"
+        >
+          <Eye className="w-4 h-4 mr-1" />
+          {showDetails ? 'Hide' : 'Show'} Details
+        </button>
 
         {/* Expandable Details */}
         {showDetails && (
@@ -129,23 +109,61 @@ const DepositCard: React.FC<DepositCardProps> = ({ depositId, onWithdraw, onEmer
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4 pt-4 border-t border-gray-200 space-y-2"
+            className="border-t pt-4 mb-4 space-y-2"
           >
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Created:</span>
-              <span>{depositDetails.startDate.toLocaleDateString()}</span>
+              <span className="text-gray-600">Deposit ID</span>
+              <span className="font-medium">#{deposit.id}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Maturity:</span>
-              <span>{depositDetails.maturityDate.toLocaleDateString()}</span>
+              <span className="text-gray-600">Created</span>
+              <span className="font-medium">
+                {new Date(deposit.createdAt).toLocaleDateString()}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Accrued Interest:</span>
-              <span className="text-green-600 font-medium">
-                {formatCurrency(parseFloat(depositDetails.accruedInterest))}
+              <span className="text-gray-600">Maturity Date</span>
+              <span className="font-medium">
+                {new Date(deposit.maturityTime).toLocaleDateString()}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Status</span>
+              <span className={`font-medium flex items-center ${getStatusColor()}`}>
+                {deposit.isWithdrawn ? (
+                  <XCircle className="w-3 h-3 mr-1" />
+                ) : isMatured ? (
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                ) : (
+                  <Clock className="w-3 h-3 mr-1" />
+                )}
+                {getStatusText()}
               </span>
             </div>
           </motion.div>
+        )}
+
+        {/* Action Buttons */}
+        {!deposit.isWithdrawn && (
+          <div className="flex space-x-2">
+            {isMatured ? (
+              <button
+                onClick={() => onWithdraw(deposit.id)}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+              >
+                <ArrowUpRight className="w-4 h-4 mr-1" />
+                Withdraw
+              </button>
+            ) : (
+              <button
+                onClick={() => onEmergencyWithdraw(deposit.id)}
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+              >
+                <AlertCircle className="w-4 h-4 mr-1" />
+                Emergency Withdraw
+              </button>
+            )}
+          </div>
         )}
       </div>
     </motion.div>
@@ -154,207 +172,261 @@ const DepositCard: React.FC<DepositCardProps> = ({ depositId, onWithdraw, onEmer
 
 const SavingsPage: React.FC = () => {
   const { isConnected } = useAccount()
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
-  
-  // Contract hooks
-  const { userSummary, userDeposits, withdrawDeposit, emergencyWithdraw, isWithdrawing, isEmergencyWithdrawing } = usePiggyVault()
-  const { balance: usdtBalance } = useMockUSDT()
-  const { nftSummary, userTier } = useNFTRewards()
+  const { 
+    portfolioSummary, 
+    userDeposits, 
+    savingsPlans,
+    isLoadingDeposits,
+    withdrawHook,
+    refetchAll 
+  } = useSavingsData()
 
-  const handleWithdraw = async (depositId: number) => {
-    try {
-      await withdrawDeposit(depositId)
-    } catch (error) {
-      console.error('Withdrawal failed:', error)
-    }
+  const [selectedPlan, setSelectedPlan] = useState<any>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const { withdrawDeposit, emergencyWithdraw, isWithdrawing, isEmergencyWithdrawing } = withdrawHook
+
+  const handleCreateSavings = (plan: any) => {
+    setSelectedPlan(plan)
+    setIsModalOpen(true)
   }
 
-  const handleEmergencyWithdraw = async (depositId: number) => {
-    if (window.confirm('Emergency withdrawal may incur penalties. Continue?')) {
-      try {
-        await emergencyWithdraw(depositId)
-      } catch (error) {
-        console.error('Emergency withdrawal failed:', error)
-      }
+  const handleModalSuccess = () => {
+    refetchAll()
+  }
+
+  const getColorClasses = (color: string) => {
+    const colorMap = {
+      blue: 'from-blue-400 to-blue-600',
+      green: 'from-green-400 to-green-600',
+      purple: 'from-purple-400 to-purple-600',
+      orange: 'from-orange-400 to-orange-600',
+      pink: 'from-pink-400 to-pink-600'
     }
+    return colorMap[color as keyof typeof colorMap] || colorMap.blue
   }
 
   if (!isConnected) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🔒</div>
-          <h2 className="text-2xl font-bold mb-2">Connect Your Wallet</h2>
-          <p className="text-gray-600">
-            Please connect your wallet to access savings features
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center bg-white rounded-2xl p-8 shadow-lg max-w-md w-full"
+        >
+          <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full mx-auto flex items-center justify-center mb-4">
+            <Wallet className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Connect Your Wallet</h2>
+          <p className="text-gray-600 mb-6">
+            Connect your wallet to access savings plans and start earning rewards
           </p>
-        </div>
+          <button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:from-pink-600 hover:to-purple-600 transition-colors">
+            Connect Wallet
+          </button>
+        </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          className="mb-8"
         >
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Your Savings</h1>
-            <p className="text-gray-600">
-              Manage your DeFi savings deposits and track earnings
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Savings Dashboard</h1>
+              <p className="text-gray-600">Manage your savings plans and track your earnings</p>
+            </div>
+            <button
+              onClick={refetchAll}
+              className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </button>
           </div>
+        </motion.div>
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <DollarSign className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-gray-600">Total Saved</p>
-                  <p className="text-xl font-bold">
-                    {formatCurrency(parseFloat(userSummary.totalDeposited))}
-                  </p>
-                </div>
-              </div>
+        {/* Portfolio Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl p-6 text-white mb-8"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center md:text-left">
+              <p className="text-pink-100 text-sm">Total Balance</p>
+              <p className="text-3xl font-bold">${portfolioSummary.totalBalance.toFixed(2)}</p>
             </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-gray-600">Total Earned</p>
-                  <p className="text-xl font-bold text-green-600">
-                    +{formatCurrency(parseFloat(userSummary.totalRewards))}
-                  </p>
-                </div>
-              </div>
+            <div className="text-center md:text-left">
+              <p className="text-pink-100 text-sm">Active Deposits</p>
+              <p className="text-2xl font-bold">${portfolioSummary.totalDeposited.toFixed(2)}</p>
+              <p className="text-pink-200 text-xs">{portfolioSummary.activeDeposits} plans</p>
             </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <Clock className="w-6 h-6 text-purple-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-gray-600">Active Deposits</p>
-                  <p className="text-xl font-bold">{userSummary.depositCount}</p>
-                </div>
-              </div>
+            <div className="text-center md:text-left">
+              <p className="text-pink-100 text-sm">Total Earnings</p>
+              <p className="text-2xl font-bold">${portfolioSummary.totalInterestEarned.toFixed(2)}</p>
             </div>
+            <div className="text-center md:text-left">
+              <p className="text-pink-100 text-sm">NFT Rewards</p>
+              <p className="text-2xl font-bold flex items-center justify-center md:justify-start">
+                <Award className="w-6 h-6 mr-2" />
+                {portfolioSummary.userNFTCount}
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-yellow-100 rounded-lg">
-                  <Award className="w-6 h-6 text-yellow-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-gray-600">{userTier.tierName} Tier</p>
-                  <p className="text-xl font-bold">{nftSummary.nftCount} NFTs</p>
-                </div>
-              </div>
+        {/* Available Savings Plans */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Available Savings Plans</h2>
+            <div className="text-sm text-gray-600">
+              Available Balance: ${portfolioSummary.availableBalance.toFixed(2)} USDT
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-            <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button
-                onClick={() => setIsDepositModalOpen(true)}
-                className="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-3"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {savingsPlans.map((plan, index) => (
+              <motion.div
+                key={plan.days}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * index }}
+                className={`bg-gradient-to-br ${getColorClasses(plan.color)} rounded-xl p-6 text-white relative overflow-hidden cursor-pointer hover:scale-105 transition-transform`}
+                onClick={() => handleCreateSavings(plan)}
               >
-                <Plus className="w-5 h-5" />
-                Create New Deposit
-              </button>
-              
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm text-gray-600">Available Balance</div>
-                <div className="text-lg font-semibold">
-                  {parseFloat(usdtBalance).toFixed(6)} USDT
+                {plan.popular && (
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium">
+                      Popular
+                    </span>
+                  </div>
+                )}
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                      <Target className="w-5 h-5" />
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold">{plan.apy.toFixed(1)}%</p>
+                      <p className="text-xs opacity-80">APY</p>
+                    </div>
+                  </div>
+
+                  <h3 className="text-lg font-semibold mb-2">{plan.days} Days</h3>
+                  <p className="text-sm opacity-90 mb-4">{plan.description}</p>
+
+                  <div className="text-xs opacity-80 mb-4">
+                    <p>Min: ${plan.minAmount}</p>
+                    <p>Max: ${formatCurrency(plan.maxAmount)}</p>
+                    <p>Risk: {plan.risk}</p>
+                  </div>
+
+                  <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Plan
+                  </button>
                 </div>
-              </div>
-              
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm text-gray-600">Total Value</div>
-                <div className="text-lg font-semibold">
-                  {formatCurrency(
-                    parseFloat(userSummary.totalDeposited) + parseFloat(userSummary.totalRewards)
-                  )}
-                </div>
-              </div>
-            </div>
+
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white bg-opacity-10 rounded-full -mr-10 -mt-10"></div>
+                <div className="absolute bottom-0 left-0 w-16 h-16 bg-white bg-opacity-10 rounded-full -ml-8 -mb-8"></div>
+              </motion.div>
+            ))}
           </div>
+        </motion.div>
 
-          {/* Active Deposits */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Your Deposits</h2>
-              {userDeposits.length > 0 && (
-                <div className="text-sm text-gray-600">
-                  {userDeposits.length} active deposits
+        {/* Active Deposits */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Active Savings</h2>
+
+          {isLoadingDeposits ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl p-6 animate-pulse">
+                  <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-2 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
                 </div>
-              )}
+              ))}
             </div>
-
-            {userDeposits.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <div className="text-gray-400 text-6xl mb-4">💰</div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No deposits yet</h3>
-                <p className="text-gray-600 mb-6">
-                  Start earning yield on your USDT by creating your first deposit
-                </p>
-                <button
-                  onClick={() => setIsDepositModalOpen(true)}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+          ) : userDeposits.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userDeposits.map((deposit, index) => (
+                <motion.div
+                  key={deposit.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index }}
                 >
-                  <Plus className="w-5 h-5" />
-                  Create First Deposit
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userDeposits.map((depositId: bigint, index: number) => (
                   <DepositCard
-                    key={index}
-                    depositId={Number(depositId)}
-                    onWithdraw={handleWithdraw}
-                    onEmergencyWithdraw={handleEmergencyWithdraw}
+                    deposit={deposit}
+                    onWithdraw={withdrawDeposit}
+                    onEmergencyWithdraw={emergencyWithdraw}
                   />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Loading States */}
-          {(isWithdrawing || isEmergencyWithdrawing) && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 flex items-center gap-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                <span>
-                  {isWithdrawing ? 'Processing withdrawal...' : 'Processing emergency withdrawal...'}
-                </span>
-              </div>
+                </motion.div>
+              ))}
             </div>
-          )}
-
-          {/* Deposit Modal */}
-          {isDepositModalOpen && (
-            <DepositModal
-              isOpen={isDepositModalOpen}
-              onClose={() => setIsDepositModalOpen(false)}
-            />
+          ) : (
+            <div className="text-center py-12 bg-white rounded-xl">
+              <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <PieChart className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Savings</h3>
+              <p className="text-gray-600 mb-6">Start your first savings plan to begin earning rewards</p>
+              <button
+                onClick={() => handleCreateSavings(savingsPlans[1])} // Default to popular plan
+                className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:from-pink-600 hover:to-purple-600 transition-colors"
+              >
+                Create Your First Savings Plan
+              </button>
+            </div>
           )}
         </motion.div>
       </div>
+
+      {/* Savings Modal */}
+      <SavingsModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedPlan(null)
+        }}
+        selectedPlan={selectedPlan}
+        onSuccess={handleModalSuccess}
+      />
+
+      {/* Loading Overlay */}
+      {(isWithdrawing || isEmergencyWithdrawing) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-gray-900 font-medium">
+              {isWithdrawing ? 'Processing withdrawal...' : 'Processing emergency withdrawal...'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

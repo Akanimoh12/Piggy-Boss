@@ -27,6 +27,7 @@ const MAX_AMOUNT = 100000
 interface DepositModalProps {
   isOpen: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
 // Animation variants
@@ -88,7 +89,7 @@ const ConfettiEffect: React.FC = () => {
   )
 }
 
-const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
+const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { address, isConnected } = useAccount()
   
   // Contract hooks
