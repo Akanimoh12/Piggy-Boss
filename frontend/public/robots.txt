@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://piggyboss.finance/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
+
+# Block access to source maps and config files
+Disallow: *.map
+Disallow: /config/
+Disallow: /.env
+Disallow: /src/
+
+# Allow important pages
+Allow: /
+Allow: /dashboard
+Allow: /savings
+Allow: /faucet
