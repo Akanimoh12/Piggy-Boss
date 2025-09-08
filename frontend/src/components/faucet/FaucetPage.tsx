@@ -11,11 +11,9 @@ const FaucetPage: React.FC = () => {
   const { isConnected } = useAccount()
 
   const handleSuccessfulClaim = useCallback(() => {
-    // Force refresh of all components by triggering a small delay
     setTimeout(() => {
       window.location.reload()
     }, 2000)
-    console.log('Faucet claim successful!');
     toast.success("Faucet claim successful! 🎉")
   }, []);
 

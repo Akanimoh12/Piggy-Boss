@@ -1,6 +1,5 @@
 /// <reference types="vite/client" />
 
-// Vite environment variables
 interface ImportMetaEnv {
   readonly VITE_SOMNIA_RPC_URL: string
   readonly VITE_SOMNIA_CHAIN_ID: string
@@ -22,7 +21,6 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
-// Extend Window for global types
 declare global {
   interface Window {
     ethereum?: any

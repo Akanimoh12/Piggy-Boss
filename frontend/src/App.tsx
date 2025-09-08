@@ -10,11 +10,10 @@ import FloatingDepositButton from '@components/common/FloatingDepositButton'
 
 const App: React.FC = () => {
   const { isConnected } = useAccount()
-  const isLoading = false // Remove loading state for now
+  const isLoading = false
 
   return (
     <>
-      {/* SEO and Meta Tags */}
       <Helmet>
         <title>Piggy Boss - DeFi Savings Platform</title>
         <meta 
@@ -23,36 +22,29 @@ const App: React.FC = () => {
         />
         <meta name="keywords" content="DeFi, savings, yield, crypto, Somnia Network, NFT rewards, blockchain" />
         
-        {/* Open Graph / Social Media */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Piggy Boss - DeFi Savings Platform" />
         <meta property="og:description" content="Earn high-yield interest on your crypto savings with Piggy Boss." />
         <meta property="og:image" content="/og-image.png" />
         <meta property="og:url" content="https://piggyboss.finance" />
         
-        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Piggy Boss - DeFi Savings Platform" />
         <meta name="twitter:description" content="Earn high-yield interest on your crypto savings with Piggy Boss." />
         <meta name="twitter:image" content="/twitter-image.png" />
         
-        {/* Favicon and Icons */}
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         
-        {/* Theme and Viewport */}
         <meta name="theme-color" content="#0a120e" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         
-        {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://dream-rpc.somnia.network" />
         <link rel="dns-prefetch" href="https://shannon-explorer.somnia.network" />
       </Helmet>
 
-      {/* Main App Container */}
       <div className="min-h-screen bg-white text-gray-900 overflow-hidden">
         <BrowserRouter>
-          {/* Navigation */}
           <Navigation />
           
           <AnimatePresence mode="wait">

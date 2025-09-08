@@ -7,7 +7,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Piggy Boss Brand Colors
         primary: {
           50: '#f6f8f7',
           100: '#e1e8e3',
@@ -60,7 +59,6 @@ export default {
           900: '#3d403d',
           DEFAULT: '#f0f0ea',
         },
-        // Functional colors
         success: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -148,7 +146,6 @@ export default {
         '128': '32rem',
       },
       animation: {
-        // Custom animations for Piggy Boss
         'bounce-slow': 'bounce 3s infinite',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'spin-slow': 'spin 8s linear infinite',
@@ -239,7 +236,6 @@ export default {
     },
   },
   plugins: [
-    // Custom plugin for Piggy Boss utilities
     function({ addUtilities, theme }) {
       const newUtilities = {
         '.text-balance': {

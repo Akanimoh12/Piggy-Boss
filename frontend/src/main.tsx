@@ -139,18 +139,11 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered: ', registration)
       })
       .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError)
       })
   })
 }
 
-// Performance monitoring in development
 if (import.meta.env.DEV) {
-  // You can add performance monitoring tools here
-  console.log('🐷 Piggy Boss DeFi Platform - Development Mode')
-  console.log('Network: Somnia Testnet (Chain ID: 50312)')
-  console.log('RPC URL:', import.meta.env.VITE_SOMNIA_RPC_URL)
 }

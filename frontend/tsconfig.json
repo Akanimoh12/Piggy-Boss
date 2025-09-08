@@ -8,7 +8,6 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
 
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
@@ -16,13 +15,11 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
@@ -37,7 +34,6 @@
       "@abi/*": ["./src/abi/*"]
     },
 
-    /* Additional options for better DX */
     "forceConsistentCasingInFileNames": true,
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,

@@ -126,7 +126,6 @@ const FaucetClaimWorking: React.FC<FaucetClaimProps> = ({ onSuccessfulClaim }) =
     }
 
     try {
-      console.log('Attempting to claim from faucet...')
       showTransactionPendingToast('Submitting claim transaction...')
       writeClaim()
     } catch (error: any) {
@@ -301,7 +300,6 @@ const FaucetClaimWorking: React.FC<FaucetClaimProps> = ({ onSuccessfulClaim }) =
         </div>
       </div>
 
-      {/* Debug info */}
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
           <p>Debug Info:</p>

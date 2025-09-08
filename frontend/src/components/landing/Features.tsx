@@ -1,10 +1,3 @@
-/**
- * Features Component - Landing Page Features Section
- * 
- * Modern AI-focused features section with pink/white theme
- * showcasing Piggy Boss platform capabilities and AI insights.
- */
-
 import React from 'react'
 import { motion } from 'framer-motion'
 import { 
