@@ -319,6 +319,10 @@ contract PiggyVault is IPiggyVault, ReentrancyGuard, Ownable {
         
         return interest;
     }
+
+    function getPendingRewards(uint256 _depositId) external view returns (uint256) {
+        return _calculatePendingRewards(_depositId);
+    }
     
     function updateSavingsPlan(
         uint256 _planDays,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useAccount } from 'wagmi'
+import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi'
 import { 
   Clock, 
   Award, 
@@ -13,11 +13,17 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  TrendingUp,
+  DollarSign,
+  Trophy,
+  Star
 } from 'lucide-react'
-import { useSavingsData } from '../../hooks/useSavingsData'
+import { useRealSavingsData } from '../../hooks/useRealSavingsData'
 import { formatCurrency } from '../../utils/formatters'
 import SavingsModal from './SavingsModal'
+import { CONTRACTS } from '../../config/contracts'
+import { toast } from '../../utils/toast'
 
 interface DepositCardProps {
   deposit: {
@@ -172,19 +178,45 @@ const DepositCard: React.FC<DepositCardProps> = ({ deposit, onWithdraw, onEmerge
 
 const SavingsPage: React.FC = () => {
   const { isConnected } = useAccount()
-  const { 
-    portfolioSummary, 
-    userDeposits, 
-    savingsPlans,
-    isLoadingDeposits,
-    withdrawHook,
-    refetchAll 
-  } = useSavingsData()
+  const realData = useRealSavingsData()
 
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { withdrawDeposit, emergencyWithdraw, isWithdrawing, isEmergencyWithdrawing } = withdrawHook
+  // Withdrawal functionality
+  const { 
+    data: withdrawTxHash, 
+    write: writeWithdraw, 
+    isLoading: isWithdrawing 
+  } = useContractWrite({
+    ...CONTRACTS.PiggyVault,
+    functionName: 'withdraw',
+  })
+  
+  const { 
+    data: emergencyTxHash, 
+    write: writeEmergencyWithdraw, 
+    isLoading: isEmergencyWithdrawing 
+  } = useContractWrite({
+    ...CONTRACTS.PiggyVault,
+    functionName: 'emergencyWithdraw',
+  })
+
+  const { isLoading: isWithdrawConfirming } = useWaitForTransaction({
+    hash: withdrawTxHash?.hash,
+    onSuccess: () => {
+      toast.success('Withdrawal completed successfully!')
+      realData.refetchAll()
+    },
+  })
+
+  const { isLoading: isEmergencyConfirming } = useWaitForTransaction({
+    hash: emergencyTxHash?.hash,
+    onSuccess: () => {
+      toast.success('Emergency withdrawal completed successfully!')
+      realData.refetchAll()
+    },
+  })
 
   const handleCreateSavings = (plan: any) => {
     setSelectedPlan(plan)
@@ -192,7 +224,33 @@ const SavingsPage: React.FC = () => {
   }
 
   const handleModalSuccess = () => {
-    refetchAll()
+    realData.refetchAll()
+  }
+
+  const withdrawDeposit = async (depositId: number) => {
+    try {
+      writeWithdraw({
+        args: [BigInt(depositId)],
+      })
+      
+      toast.success('Withdrawal initiated successfully!')
+    } catch (error: any) {
+      console.error('Withdrawal error:', error)
+      toast.error(error?.message || 'Failed to withdraw deposit')
+    }
+  }
+
+  const emergencyWithdraw = async (depositId: number) => {
+    try {
+      writeEmergencyWithdraw({
+        args: [BigInt(depositId)],
+      })
+      
+      toast.success('Emergency withdrawal initiated successfully!')
+    } catch (error: any) {
+      console.error('Emergency withdrawal error:', error)
+      toast.error(error?.message || 'Failed to emergency withdraw deposit')
+    }
   }
 
   const getColorClasses = (color: string) => {
@@ -244,7 +302,7 @@ const SavingsPage: React.FC = () => {
               <p className="text-gray-600">Manage your savings plans and track your earnings</p>
             </div>
             <button
-              onClick={refetchAll}
+              onClick={realData.refetchAll}
               className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
@@ -262,24 +320,36 @@ const SavingsPage: React.FC = () => {
         >
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center md:text-left">
-              <p className="text-pink-100 text-sm">Total Balance</p>
-              <p className="text-3xl font-bold">${portfolioSummary.totalBalance.toFixed(2)}</p>
+              <div className="flex items-center justify-center md:justify-start mb-2">
+                <Wallet className="w-5 h-5 mr-2" />
+                <p className="text-pink-100 text-sm">Available Balance</p>
+              </div>
+              <p className="text-3xl font-bold">${realData.portfolioSummary.availableBalance.toFixed(2)}</p>
+              <p className="text-pink-200 text-xs">USDT</p>
             </div>
             <div className="text-center md:text-left">
-              <p className="text-pink-100 text-sm">Active Deposits</p>
-              <p className="text-2xl font-bold">${portfolioSummary.totalDeposited.toFixed(2)}</p>
-              <p className="text-pink-200 text-xs">{portfolioSummary.activeDeposits} plans</p>
+              <div className="flex items-center justify-center md:justify-start mb-2">
+                <PieChart className="w-5 h-5 mr-2" />
+                <p className="text-pink-100 text-sm">Active Deposits</p>
+              </div>
+              <p className="text-2xl font-bold">${realData.portfolioSummary.totalDeposited.toFixed(2)}</p>
+              <p className="text-pink-200 text-xs">{realData.portfolioSummary.activeDeposits} plans active</p>
             </div>
             <div className="text-center md:text-left">
-              <p className="text-pink-100 text-sm">Total Earnings</p>
-              <p className="text-2xl font-bold">${portfolioSummary.totalInterestEarned.toFixed(2)}</p>
+              <div className="flex items-center justify-center md:justify-start mb-2">
+                <TrendingUp className="w-5 h-5 mr-2" />
+                <p className="text-pink-100 text-sm">Total Earnings</p>
+              </div>
+              <p className="text-2xl font-bold">${realData.portfolioSummary.totalEarnings.toFixed(2)}</p>
+              <p className="text-pink-200 text-xs">Interest earned</p>
             </div>
             <div className="text-center md:text-left">
-              <p className="text-pink-100 text-sm">NFT Rewards</p>
-              <p className="text-2xl font-bold flex items-center justify-center md:justify-start">
-                <Award className="w-6 h-6 mr-2" />
-                {portfolioSummary.userNFTCount}
-              </p>
+              <div className="flex items-center justify-center md:justify-start mb-2">
+                <Trophy className="w-5 h-5 mr-2" />
+                <p className="text-pink-100 text-sm">NFT Rewards</p>
+              </div>
+              <p className="text-2xl font-bold">{realData.portfolioSummary.nftRewards}</p>
+              <p className="text-pink-200 text-xs">{realData.portfolioSummary.achievementPoints} achievement points</p>
             </div>
           </div>
         </motion.div>
@@ -294,12 +364,12 @@ const SavingsPage: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Available Savings Plans</h2>
             <div className="text-sm text-gray-600">
-              Available Balance: ${portfolioSummary.availableBalance.toFixed(2)} USDT
+              Available Balance: ${realData.portfolioSummary.availableBalance.toFixed(2)} USDT
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {savingsPlans.map((plan, index) => (
+            {realData.savingsPlans && realData.savingsPlans.map((plan, index) => (
               <motion.div
                 key={plan.days}
                 initial={{ opacity: 0, y: 20 }}
@@ -358,7 +428,7 @@ const SavingsPage: React.FC = () => {
         >
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Active Savings</h2>
 
-          {isLoadingDeposits ? (
+          {realData.isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="bg-white rounded-xl p-6 animate-pulse">
@@ -370,20 +440,94 @@ const SavingsPage: React.FC = () => {
                 </div>
               ))}
             </div>
-          ) : userDeposits.length > 0 ? (
+          ) : realData.userDeposits && realData.userDeposits.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {userDeposits.map((deposit, index) => (
+              {realData.userDeposits.map((deposit, index) => (
                 <motion.div
                   key={deposit.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
+                  className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
                 >
-                  <DepositCard
-                    deposit={deposit}
-                    onWithdraw={withdrawDeposit}
-                    onEmergencyWithdraw={emergencyWithdraw}
-                  />
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg text-gray-900">
+                        Deposit #{deposit.id}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {deposit.category ? 
+                          (deposit.category.charAt(0).toUpperCase() + deposit.category.slice(1) + ' Plan') : 
+                          'Savings Plan'
+                        }
+                      </p>
+                    </div>
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      deposit.isActive 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {deposit.isActive ? 'Active' : 'Matured'}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 mb-4">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Amount:</span>
+                      <span className="font-semibold">{deposit.formattedAmount} USDT</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Interest Rate:</span>
+                      <span className="font-semibold text-green-600">{deposit.interestRate}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Duration:</span>
+                      <span className="font-semibold">{deposit.duration} days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Maturity:</span>
+                      <span className="font-semibold">
+                        {new Date(deposit.maturityDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Current Value:</span>
+                      <span className="font-semibold text-green-600">
+                        {deposit.formattedCurrentValue} USDT
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {deposit.isActive ? (
+                      <>
+                        <button
+                          onClick={() => withdrawDeposit(parseInt(deposit.id))}
+                          disabled={!deposit.canWithdraw}
+                          className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+                            deposit.canWithdraw
+                              ? 'bg-green-600 hover:bg-green-700 text-white'
+                              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          }`}
+                        >
+                          {deposit.canWithdraw ? 'Withdraw' : `Matures in ${deposit.daysRemaining} days`}
+                        </button>
+                        <button
+                          onClick={() => emergencyWithdraw(parseInt(deposit.id))}
+                          className="w-full py-2 px-4 rounded-lg font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                        >
+                          Emergency Withdraw (Penalty applies)
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => withdrawDeposit(parseInt(deposit.id))}
+                        className="w-full py-2 px-4 rounded-lg font-medium bg-green-600 hover:bg-green-700 text-white transition-colors"
+                      >
+                        Claim Matured Deposit
+                      </button>
+                    )}
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -395,8 +539,9 @@ const SavingsPage: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Savings</h3>
               <p className="text-gray-600 mb-6">Start your first savings plan to begin earning rewards</p>
               <button
-                onClick={() => handleCreateSavings(savingsPlans[1])} // Default to popular plan
+                onClick={() => handleCreateSavings(realData.savingsPlans?.[1] || null)} // Default to popular plan
                 className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:from-pink-600 hover:to-purple-600 transition-colors"
+                disabled={!realData.savingsPlans?.[1]}
               >
                 Create Your First Savings Plan
               </button>

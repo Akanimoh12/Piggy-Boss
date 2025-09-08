@@ -1,10 +1,3 @@
-/**
- * YieldChart Component
- * 
- * Displays a yield performance chart using a lightweight chart library.
- * Shows historical yield data with interactive tooltips and period selection.
- * For now, uses a placeholder chart that will be replaced with actual charting library.
- */
 
 import React, { useState, useEffect } from 'react'
 
