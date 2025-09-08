@@ -7,10 +7,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # 
-# frontend 
-# README.md
-SETUP.md
-install.sh
+VIDEO_PITCH.md 
 
 # Environment variables
 .env
