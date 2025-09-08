@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import ModernHero from './ModernHero'
+import Hero from './Hero'
 import Features from './Features'
 import Footer from '../common/Footer'
 
@@ -14,7 +14,7 @@ const LandingPage: React.FC = () => {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
-      <ModernHero />
+      <Hero />
       
       {/* Features Section */}
       <Features />

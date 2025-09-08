@@ -28,9 +28,11 @@ const Navigation: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">P</span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Piggy Boss Logo" 
+              className="w-10 h-10 drop-shadow-sm"
+            />
             <span className="text-xl font-bold text-gray-900">Piggy Boss</span>
           </Link>
 
