@@ -57,12 +57,17 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      external: [
+        '@safe-globalThis/safe-apps-provider',
+        '@safe-globalThis/safe-apps-sdk',
+        '@safe-global/safe-apps-provider',
+        '@safe-global/safe-apps-sdk'
+      ],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           web3: ['wagmi', 'viem', 'ethers'],
-          ui: ['framer-motion', 'lucide-react'],
-          three: ['three', '@react-three/fiber', '@react-three/drei']
+          ui: ['framer-motion', 'lucide-react']
         }
       }
     },
