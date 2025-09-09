@@ -9,6 +9,13 @@ lerna-debug.log*
 # 
 VIDEO_PITCH.md 
 
+# frontend 
+# README.md
+SETUP.md
+install.sh
+VIDEO_PITCH.md
+
+
 # Environment variables
 .env
 .env.local
