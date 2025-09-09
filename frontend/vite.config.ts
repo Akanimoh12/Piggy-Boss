@@ -68,6 +68,12 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           web3: ['wagmi', 'viem', 'ethers'],
           ui: ['framer-motion', 'lucide-react']
+        },
+        globals: {
+          '@safe-globalThis/safe-apps-provider': 'SafeAppsProvider',
+          '@safe-globalThis/safe-apps-sdk': 'SafeAppsSDK',
+          '@safe-global/safe-apps-provider': 'SafeAppsProvider',
+          '@safe-global/safe-apps-sdk': 'SafeAppsSDK'
         }
       }
     },

@@ -5,7 +5,14 @@
  * including Somnia Network configuration and auto-connect functionality.
  */
 
-import { getDefaultWallets } from '@rainbow-me/rainbowkit'
+import { connectorsForWallets } from '@rainbow-me/rainbowkit'
+import { 
+  injectedWallet,
+  metaMaskWallet,
+  walletConnectWallet,
+  coinbaseWallet,
+  rainbowWallet
+} from '@rainbow-me/rainbowkit/wallets'
 import { configureChains, createConfig } from 'wagmi'
 import { defineChain } from 'viem'
 import { mainnet, sepolia } from 'wagmi/chains'
@@ -81,11 +88,18 @@ const { chains, publicClient } = configureChains(
 )
 
 // Configure wallets
-const { connectors } = getDefaultWallets({
-  appName: 'Piggy Boss',
-  projectId,
-  chains
-})
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [
+      injectedWallet({ chains }),
+      metaMaskWallet({ projectId, chains }),
+      walletConnectWallet({ projectId, chains }),
+      coinbaseWallet({ appName: 'Piggy Boss', chains }),
+      rainbowWallet({ projectId, chains }),
+    ],
+  },
+]);
 
 // Create Wagmi config
 export const wagmiConfig = createConfig({
