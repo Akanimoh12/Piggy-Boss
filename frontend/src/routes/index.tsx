@@ -14,7 +14,8 @@ const Dashboard = React.lazy(() => import('@components/dashboard/Dashboard'))
 const SavingsPage = React.lazy(() => import('@components/savings/SavingsPage'))
 const DepositPage = React.lazy(() => import('@components/savings/DepositPage'))
 const FaucetPage = React.lazy(() => import('@components/faucet/FaucetPage'))
-const ToastDemo = React.lazy(() => import('@components/common/ToastDemo'))
+const YieldPage = React.lazy(() => import('@components/yield/YieldPage'))
+const AIInsightsPage = React.lazy(() => import('@components/ai/AIInsightsPage'))
 
 // Loading component
 const PageLoading = () => (
@@ -37,8 +38,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="savings" element={<SavingsPage />} />
-          <Route path="yield" element={<div className="p-6">Yield Page Coming Soon</div>} />
-          <Route path="ai" element={<div className="p-6">AI Insights Coming Soon</div>} />
+          <Route path="yield" element={<YieldPage />} />
+          <Route path="ai" element={<AIInsightsPage />} />
           <Route path="faucet" element={<FaucetPage />} />
           <Route path="staking" element={<div className="p-6">Staking Coming Soon</div>} />
         </Route>
@@ -47,7 +48,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/savings" element={<Navigate to="/dashboard/savings" replace />} />
         <Route path="/deposit" element={<DepositPage />} />
         <Route path="/faucet" element={<Navigate to="/dashboard/faucet" replace />} />
-        <Route path="/toast-demo" element={<ToastDemo />} />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
