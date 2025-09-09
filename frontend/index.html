@@ -105,9 +105,7 @@
     }
     </script>
     
-    <!-- Critical CSS will be inlined here during build -->
     <style>
-      /* Critical loading styles */
       html {
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
         line-height: 1.5;
@@ -128,7 +126,6 @@
         min-height: 100vh;
       }
       
-      /* Loading animation */
       .initial-loader {
         position: fixed;
         top: 0;
@@ -210,12 +207,10 @@
         color: #5f6361;
       }
       
-      /* Prevent flash of unstyled content */
       .flash-prevention {
         visibility: hidden;
       }
       
-      /* Ensure consistent box-sizing */
       *, *::before, *::after {
         box-sizing: border-box;
       }
@@ -223,7 +218,6 @@
   </head>
   
   <body>
-    <!-- Initial Loading Screen -->
     <div class="initial-loader" id="initial-loader">
       <div class="loader-content">
         <div class="loader-pig"></div>
@@ -235,7 +229,6 @@
     <!-- Main Application Mount Point -->
     <div id="root" class="flash-prevention"></div>
     
-    <!-- Fallback for users with JavaScript disabled -->
     <noscript>
       <div style="
         position: fixed; 
@@ -279,9 +272,7 @@
     <!-- Module Script -->
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Hide initial loader and show app when React loads -->
     <script>
-      // Remove loader when page is fully loaded
       window.addEventListener('load', function() {
         setTimeout(function() {
           const loader = document.getElementById('initial-loader');
@@ -289,15 +280,13 @@
           if (loader && root) {
             loader.classList.add('hidden');
             root.classList.remove('flash-prevention');
-            // Remove loader from DOM after animation
             setTimeout(() => {
               loader.remove();
             }, 500);
           }
-        }, 1000); // Show loader for at least 1 second for branding
+        }, 1000);
       });
       
-      // Performance monitoring
       if (window.performance && window.performance.mark) {
         window.performance.mark('piggy-boss-start');
       }

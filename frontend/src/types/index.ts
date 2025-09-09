@@ -341,24 +341,6 @@ export interface AppSettings {
   }
 }
 
-// ===== EXPORT ALL TYPES =====
-
-export type {
-  Address,
-  // Re-export common types for convenience
-  User,
-  Deposit,
-  SavingsPlan,
-  NFTReward,
-  Transaction,
-  YieldData,
-  PlatformMetrics,
-  UserStats,
-  ToastNotification,
-  LoadingState,
-  ErrorState,
-}
-
 // ===== UTILITY TYPES =====
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

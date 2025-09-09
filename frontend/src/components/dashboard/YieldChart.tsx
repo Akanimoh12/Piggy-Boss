@@ -1,10 +1,3 @@
-/**
- * YieldChart Component
- * 
- * Displays a yield performance chart using a lightweight chart library.
- * Shows historical yield data with interactive tooltips and period selection.
- * For now, uses a placeholder chart that will be replaced with actual charting library.
- */
 
 import React, { useState, useEffect } from 'react'
 
@@ -15,7 +8,7 @@ interface YieldDataPoint {
 }
 
 const YieldChart: React.FC = () => {
-  const [period, setPeriod] = useState<'7D' | '30D' | '90D'>('30D')
+  const [period] = useState<'7D' | '30D' | '90D'>('30D')
   const [data, setData] = useState<YieldDataPoint[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -36,7 +29,7 @@ const YieldChart: React.FC = () => {
         const yieldValue = Math.max(0, baseYield)
         
         data.push({
-          date: date.toISOString().split('T')[0],
+          date: date.toISOString().split('T')[0] || '',
           yield: Number(yieldValue.toFixed(2)),
           apy: Number((yieldValue * 365 / days).toFixed(2))
         })
@@ -120,7 +113,7 @@ const YieldChart: React.FC = () => {
               <>
                 {/* Area */}
                 <path
-                  d={`M 0 ${100 - ((data[0].yield - minYield) / (maxYield - minYield)) * 100} 
+                  d={`M 0 ${100 - ((data[0]?.yield ?? 0 - minYield) / (maxYield - minYield)) * 100} 
                       ${data.map((d, i) => 
                         `L ${(i / (data.length - 1)) * 100} ${100 - ((d.yield - minYield) / (maxYield - minYield)) * 100}`
                       ).join(' ')} 
@@ -130,7 +123,7 @@ const YieldChart: React.FC = () => {
                 
                 {/* Line */}
                 <path
-                  d={`M 0 ${100 - ((data[0].yield - minYield) / (maxYield - minYield)) * 100} 
+                  d={`M 0 ${100 - ((data[0]?.yield ?? 0 - minYield) / (maxYield - minYield)) * 100} 
                       ${data.map((d, i) => 
                         `L ${(i / (data.length - 1)) * 100} ${100 - ((d.yield - minYield) / (maxYield - minYield)) * 100}`
                       ).join(' ')}`}

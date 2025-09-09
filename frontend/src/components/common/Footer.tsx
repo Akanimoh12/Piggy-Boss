@@ -167,9 +167,11 @@ const Footer: React.FC = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">P</span>
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="Piggy Boss Logo" 
+                className="w-10 h-10 drop-shadow-sm"
+              />
               <span className="text-2xl font-bold">Piggy Boss</span>
             </div>
             <p className="text-gray-400 text-lg max-w-md">

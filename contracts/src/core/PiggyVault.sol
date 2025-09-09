@@ -76,32 +76,32 @@ contract PiggyVault is IPiggyVault, ReentrancyGuard, Ownable {
         _savingsPlans[30] = SavingsPlan({
             duration: 30 days,
             apyBasisPoints: 300,
-            minAmount: 10 * 10**18,
-            maxAmount: 1000 * 10**18,
+            minAmount: 10 * 10**6,  // 10 USDT (6 decimals)
+            maxAmount: 1000 * 10**6,  // 1,000 USDT (6 decimals)
             isActive: true
         });
 
         _savingsPlans[90] = SavingsPlan({
             duration: 90 days,
             apyBasisPoints: 500,
-            minAmount: 10 * 10**18,
-            maxAmount: 5000 * 10**18,
+            minAmount: 10 * 10**6,  // 10 USDT (6 decimals)
+            maxAmount: 5000 * 10**6,  // 5,000 USDT (6 decimals)
             isActive: true
         });
 
         _savingsPlans[180] = SavingsPlan({
             duration: 180 days,
             apyBasisPoints: 800,
-            minAmount: 10 * 10**18,
-            maxAmount: 10000 * 10**18,
+            minAmount: 10 * 10**6,  // 10 USDT (6 decimals)
+            maxAmount: 10000 * 10**6,  // 10,000 USDT (6 decimals)
             isActive: true
         });
 
         _savingsPlans[365] = SavingsPlan({
             duration: 365 days,
             apyBasisPoints: 1200,
-            minAmount: 10 * 10**18,
-            maxAmount: 50000 * 10**18,
+            minAmount: 10 * 10**6,  // 10 USDT (6 decimals)
+            maxAmount: 50000 * 10**6,  // 50,000 USDT (6 decimals)
             isActive: true
         });
     }
@@ -144,13 +144,13 @@ contract PiggyVault is IPiggyVault, ReentrancyGuard, Ownable {
         
         string memory category;
         if (_planDays <= 30) {
-            category = "starter";
+            category = "month_saver";
         } else if (_planDays <= 90) {
-            category = "saver";
+            category = "quarter_saver";
         } else if (_planDays <= 180) {
-            category = "investor";
+            category = "half_year_saver";
         } else {
-            category = "champion";
+            category = "year_champion";
         }
         
         nftRewards.mintReward(msg.sender, category);
@@ -318,6 +318,10 @@ contract PiggyVault is IPiggyVault, ReentrancyGuard, Ownable {
             .div(10000);
         
         return interest;
+    }
+
+    function getPendingRewards(uint256 _depositId) external view returns (uint256) {
+        return _calculatePendingRewards(_depositId);
     }
     
     function updateSavingsPlan(

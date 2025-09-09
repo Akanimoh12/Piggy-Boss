@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
@@ -18,6 +18,8 @@ import { useAccount, useDisconnect } from 'wagmi'
 interface SidebarProps {
   isCollapsed: boolean
   onToggle: () => void
+  isMobileOpen?: boolean
+  onMobileClose?: () => void
 }
 
 const navigation = [
@@ -29,22 +31,51 @@ const navigation = [
   { name: 'Staking', href: '/dashboard/staking', icon: FiLayers },
 ]
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, isMobileOpen = false, onMobileClose }) => {
   const location = useLocation()
   const { address } = useAccount()
   const { disconnect } = useDisconnect()
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 1024)
+    }
+    
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`
   }
 
   return (
-    <motion.div
-      initial={false}
-      animate={{ width: isCollapsed ? 80 : 280 }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="bg-white border-r border-gray-200 flex flex-col shadow-sm"
-    >
+    <>
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <motion.div
+        initial={false}
+        animate={{ 
+          width: isCollapsed ? 80 : 280,
+          x: isDesktop ? 0 : (isMobileOpen ? 0 : -280)
+        }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className={`
+          fixed top-0 left-0 h-screen bg-white border-r border-gray-200 flex flex-col shadow-lg z-50
+          lg:relative lg:translate-x-0 lg:z-30 lg:h-screen
+          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
@@ -54,9 +85,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
             exit={{ opacity: 0 }}
             className="flex items-center space-x-2"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Piggy Boss Logo" 
+              className="w-8 h-8"
+            />
             <span className="font-bold text-gray-900">Piggy Boss</span>
           </motion.div>
         )}
@@ -166,6 +199,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
         </button>
       </div>
     </motion.div>
+    </>
   )
 }
 

@@ -58,7 +58,6 @@ const toastStyles = {
 }
 
 export const Toast: React.FC<ToastProps> = ({
-  id,
   type,
   title,
   message,
@@ -79,6 +78,7 @@ export const Toast: React.FC<ToastProps> = ({
 
       return () => clearTimeout(timer)
     }
+    return undefined;
   }, [isVisible, duration, onClose])
 
   return (
@@ -240,11 +240,11 @@ export const useToast = () => {
       id,
       type: options.type || 'info',
       title,
-      message,
+      message: message ?? '',
       duration: options.duration ?? 3000,
       isVisible: true,
       onClose: () => removeToast(id),
-      action: options.action,
+      ...(options.action && { action: options.action }),
     }
 
     setToasts(prev => [...prev, newToast])

@@ -1,13 +1,3 @@
-/**
- * AI Insights Component - Displays AI-powered recommendations
- * 
- * Features:
- * - Yield optimization suggestions
- * - Best deposit timing
- * - Risk assessments
- * - Personalized savings goals
- */
-
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
