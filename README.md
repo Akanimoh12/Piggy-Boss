@@ -59,12 +59,18 @@ Our smart contracts are deployed and verified on the Somnia Network:
 | **YieldManager** | `0x53538F8b7cF6e3022E91C3742DD32672d1dBE0bE` | [View on Shannon Explorer](https://shannon-explorer.somnia.network/address/0x53538F8b7cF6e3022E91C3742DD32672d1dBE0bE) |
 | **NFTRewards**   | `0x1Bd4FE7221e4796039c3F5eeD98ec80A84A36667` | [View on Shannon Explorer](https://shannon-explorer.somnia.network/address/0x1Bd4FE7221e4796039c3F5eeD98ec80A84A36667) |
 
+
 ### Network Information
 
 - **Network**: Somnia Testnet
 - **Chain ID**: 50312
 - **RPC URL**: https://dream-rpc.somnia.network
 - **Block Explorer**: https://shannon-explorer.somnia.network
+
+
+### Pitch Deck
+
+- **Link: **: https://docs.google.com/presentation/d/1dj3Xddl8dpEz2BkwEQ9JVZZN7MSz1kXLv74bDTz4FrU/edit?usp=sharing
 
 ## Project Architecture
 
